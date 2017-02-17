@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>
+    <style>
 /* Full-width input fields */
 input[type=text], input[type=password] {
 	width: 100%;
@@ -90,6 +90,18 @@ span.psw {
 	cursor: pointer;
 }
 
+.wrapper {
+margin: 0 left;
+border-radius: 4px 4px 0 0; /* this will round the top two corners of the main container */
+
+width: 200px;
+font-size:14px;
+white-space: pre;
+word-break:break-all;
+}
+
+
+
 /* Add Zoom Animation */
 .animate {
 	-webkit-animation: animatezoom 0.6s;
@@ -127,61 +139,68 @@ to {
 		width: 100%;
 	}
 }
-</style>
-<script src="jsencrypt.min.js"></script>
+
+
+    </style>
+    <script src="jsencrypt.min.js"></script>
 </head>
 <body onload="getPublicKey()">
 
-	<h2>Modal Login Form</h2>
-	
+<h2>Asymmetric-Cryptography </h2>
+<div id="log" class="wrapper" ></div>
 
-	<button onclick="document.getElementById('id01').style.display='block'"
-		style="width: auto;">Login</button>
+<button onclick="document.getElementById('id01').style.display='block'"
+        style="width: auto;">Login
+</button>
 
-	<div id="id01" class="modal">
-
-		<form class="modal-content animate" id="loginForm"
-			action="/action_page.php" onsubmit="return false">
-			<div class="imgcontainer">
+<div id="id01" class="modal">
+    <form class="modal-content animate" id="loginForm"
+          onsubmit="return false">
+        <div class="imgcontainer">
 				<span onclick="document.getElementById('id01').style.display='none'"
-					class="close" title="Close Modal">&times;</span> <img
-					src="img_avatar2.png" alt="Avatar" class="avatar">
-			</div>
+                      class="close" title="Close Modal">&times;</span> <img
+                src="img_avatar2.png" alt="Avatar" class="avatar">
+        </div>
 
-			<div class="container">
-				<label><b>Username</b></label> <input type="text" value="gunjanuser"
-					placeholder="Enter Username" name="uname" id="uname" required>
+        <div class="container">
+            <label><b>Username</b></label> <input type="text" value="gunjanuser"
+                                                  placeholder="Enter Username" name="uname" id="uname" required>
 
-				<label><b>Password</b></label> <input type="password" value="passvale"
-					placeholder="Enter Password" name="psw" id="psw" required>
+            <label><b>Password</b></label> <input type="password" value="passvale"
+                                                  placeholder="Enter Password" name="psw" id="psw" required>
 
-				<button type="submit" onclick="submitLoginData()">Login</button>
-				<input type="checkbox" checked="checked"> Remember me
-			</div>
+            <button type="submit" onclick="submitLoginData()">Login</button>
+            <input type="checkbox" checked="checked"> Remember me
+        </div>
 
-			<div class="container" style="background-color: #f1f1f1">
-				<button type="button"
-					onclick="document.getElementById('id01').style.display='none'"
-					class="cancelbtn">Cancel</button>
-				<span class="psw">Forgot <a href="#">password?</a></span>
-			</div>
-		</form>
-	</div>
+        <div class="container" style="background-color: #f1f1f1">
+            <button type="button"
+                    onclick="document.getElementById('id01').style.display='none'"
+                    class="cancelbtn">Cancel
+            </button>
+            <span class="psw">Forgot <a href="#">password?</a></span>
+        </div>
+    </form>
+</div>
 
-	<script>
+<script>
 // Get the modal
 var modal = document.getElementById('id01');
 var f = document.getElementById('loginForm');
+var log = document.getElementById('log');
 var publicKey = "";
-var privateKey = "";
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
-    f.reset();
-        modal.style.display = "none";
+        closeModel();
     }
 }
+function closeModel (){
+ f.reset();
+    modal.style.display = "none";
+    }
+
 function submitLoginData (){
 
 	if(f.elements.namedItem("uname").value.length>0 && f.elements.namedItem("psw").value.length>0)
@@ -197,44 +216,39 @@ function submitLoginData (){
         encrypt.setPublicKey(publicKey);
         var encryptedUserName = encrypt.encrypt(userName);
         var encryptedPassword = encrypt.encrypt(password);
-	    
-	    //alert(publicKey);
-	    //alert(encryptedUserName);
-	   // alert(encryptedPassword);
-	    
-	   // alert(privateKey);
-	    var decrypt = new JSEncrypt();
-        decrypt.setPrivateKey(privateKey);
-        var decU = decrypt.decrypt(encryptedUserName);
-        var decP = decrypt.decrypt(encryptedPassword);
-        alert(decU+" :: "+ decP);
-	    
-	    
-	    var params = JSON.stringify({"userName":encryptedUserName ,"password": encryptedPassword}); 
+	   //console.log( "encryptedUserName :: "+ encryptedUserName +"\n"+ encryptedPassword +" :: "+encryptedPassword) ;
+        logString("encryptedUserName :: "+ encryptedUserName );
+        logString("encryptedPassword  :: "+encryptedPassword);
+	    var params = JSON.stringify({"userName":encryptedUserName ,"password": encryptedPassword});
 	    http.send(params);
 	    http.onload = function() {
-	        alert(http.responseText);
+
+            logString("Server Response :: "+ JSON.parse(http.responseText).data);
+	        closeModel();
 	    }
 	    
 	 }
 	}
 function getPublicKey (){
-
-	
 	var http = new XMLHttpRequest();
-	    http.open("GET", "/key?appId=adbb", true);
+	    var uniqueAppId = Math.round(Math.random()*1000);
+	    http.open("GET", "/key?appId="+uniqueAppId, true);
 	    http.setRequestHeader("Content-type","application/json");
-	    //var params = JSON.stringify({"title": "foo","body": "bar","userId": 1}); //  document.getElementById(...).value
 	    http.send();
 	    http.onload = function() {
-	    	var keyData = JSON.parse(http.responseText).data;
-	    	publicKey = keyData.split("::::::::")[0];
-	    	privateKey = keyData.split("::::::::")[1];
-	       // alert(publicKey);
+	    	publicKey = JSON.parse(http.responseText).data;
+	    	logString("Public Key :: "+ publicKey );
+	    	logString("App Id :: "+ uniqueAppId );
+
 	    }
-	    
-	 
 	}
+function logString  (str)
+	{
+		    	log.innerHTML += str +"\n";
+
+	}
+
+
 </script>
 
 </body>
