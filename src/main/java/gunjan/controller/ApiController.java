@@ -55,7 +55,7 @@ public class ApiController {
 
             Cipher cipher = Cipher.getInstance("RSA");
             try {
-                cipher.init(Cipher.DECRYPT_MODE, GenerateKeys.readPrivateKey());
+                cipher.init(Cipher.DECRYPT_MODE, generateKeys.readPrivateKey(login.getAppId()));
                 byte[] encodedUser = DatatypeConverter.parseBase64Binary(login.getUserName());
                 byte[] encodedPass = DatatypeConverter.parseBase64Binary(login.getPassword());
                 uName = new String(cipher.doFinal(encodedUser), "UTF-8");

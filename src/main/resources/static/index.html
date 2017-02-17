@@ -189,6 +189,7 @@ var modal = document.getElementById('id01');
 var f = document.getElementById('loginForm');
 var log = document.getElementById('log');
 var publicKey = "";
+ var uniqueAppId = Math.round(Math.random()*1000);
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
@@ -219,7 +220,7 @@ function submitLoginData (){
 	   //console.log( "encryptedUserName :: "+ encryptedUserName +"\n"+ encryptedPassword +" :: "+encryptedPassword) ;
         logString("encryptedUserName :: "+ encryptedUserName );
         logString("encryptedPassword  :: "+encryptedPassword);
-	    var params = JSON.stringify({"userName":encryptedUserName ,"password": encryptedPassword});
+	    var params = JSON.stringify({"userName":encryptedUserName ,"password": encryptedPassword, "appId":uniqueAppId});
 	    http.send(params);
 	    http.onload = function() {
 
@@ -231,7 +232,7 @@ function submitLoginData (){
 	}
 function getPublicKey (){
 	var http = new XMLHttpRequest();
-	    var uniqueAppId = Math.round(Math.random()*1000);
+
 	    http.open("GET", "/key?appId="+uniqueAppId, true);
 	    http.setRequestHeader("Content-type","application/json");
 	    http.send();

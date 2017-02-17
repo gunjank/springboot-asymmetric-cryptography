@@ -92,10 +92,11 @@ public class GenerateKeys {
 		}
 		return publicKeyPEM;
 	}
-	public static PrivateKey readPrivateKey()
+	public PrivateKey readPrivateKey(String appId)
 			throws IOException, GeneralSecurityException, Base64DecodingException {
 		PrivateKey key = null;
-		String fileString = new String(Files.readAllBytes(Paths.get("KeyPair/privateKey")), StandardCharsets.UTF_8);
+		//String fileString = new String(Files.readAllBytes(Paths.get("KeyPair/privateKey")), StandardCharsets.UTF_8);
+		String fileString = this.jdbcInMemory.getPrivateKeyForAppId(appId);
 		fileString = fileString.replace(
 				"-----BEGIN RSA PRIVATE KEY-----\n", "")
 				.replace("-----END RSA PRIVATE KEY-----", "");

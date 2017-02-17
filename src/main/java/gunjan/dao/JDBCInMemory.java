@@ -121,5 +121,56 @@ public class JDBCInMemory {
         System.out.println("Goodbye!");
 
     } //end main
+
+
+    public String getPrivateKeyForAppId (String appId) {
+        Connection conn = null;
+        Statement stmt = null;
+        String privateKey = null;
+        try {
+            //STEP 2: Register JDBC driver
+            Class.forName(JDBC_DRIVER);
+
+            //STEP 3: Open a connection
+            System.out.println("Connecting to a selected database...");
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            System.out.println("Connected database successfully...");
+
+            //STEP 4: Execute a query
+            System.out.println("Inserting records into the table...");
+            stmt = conn.createStatement();
+            //if appid exist
+            String sql = "SELECT PRIVATE_KEY FROM USER_APP_KEY WHERE APP_ID='"+appId+"'";
+            ResultSet resultSet = stmt.executeQuery(sql);
+
+            while( resultSet.next()){
+                privateKey = resultSet.getString("PRIVATE_KEY");
+
+            }
+            resultSet.close();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt!=null)
+                    conn.close();
+            } catch (SQLException se) {
+            } // do nothing
+            try {
+                if (conn!=null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            } //end finally try
+        } //end try
+
+        return privateKey;
+
+    } //end main
 }
 
