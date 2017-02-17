@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<head>
 <style>
 /* Full-width input fields */
 input[type=text], input[type=password] {
@@ -127,9 +128,12 @@ to {
 	}
 }
 </style>
-<body>
+<script src="jsencrypt.min.js"></script>
+</head>
+<body onload="getPublicKey()">
 
 	<h2>Modal Login Form</h2>
+	
 
 	<button onclick="document.getElementById('id01').style.display='block'"
 		style="width: auto;">Login</button>
@@ -145,10 +149,10 @@ to {
 			</div>
 
 			<div class="container">
-				<label><b>Username</b></label> <input type="text"
+				<label><b>Username</b></label> <input type="text" value="gunjanuser"
 					placeholder="Enter Username" name="uname" id="uname" required>
 
-				<label><b>Password</b></label> <input type="password"
+				<label><b>Password</b></label> <input type="password" value="passvale"
 					placeholder="Enter Password" name="psw" id="psw" required>
 
 				<button type="submit" onclick="submitLoginData()">Login</button>
@@ -168,6 +172,8 @@ to {
 // Get the modal
 var modal = document.getElementById('id01');
 var f = document.getElementById('loginForm');
+var publicKey = "";
+var privateKey = "";
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
@@ -183,15 +189,51 @@ function submitLoginData (){
 
 	//alert(f.elements.namedItem("uname").value+ " - - ");
 	var http = new XMLHttpRequest();
-	    http.open("POST", "https://jsonplaceholder.typicode.com/posts", true);
+	    http.open("POST", "/login", true);
 	    http.setRequestHeader("Content-type","application/json");
-	    var params = JSON.stringify({"title": "foo","body": "bar","userId": 1}); //  document.getElementById(...).value
+	    var userName = f.elements.namedItem("uname").value;
+	    var password = f.elements.namedItem("psw").value;
+	    var encrypt = new JSEncrypt();
+        encrypt.setPublicKey(publicKey);
+        var encryptedUserName = encrypt.encrypt(userName);
+        var encryptedPassword = encrypt.encrypt(password);
+	    
+	    //alert(publicKey);
+	    //alert(encryptedUserName);
+	   // alert(encryptedPassword);
+	    
+	   // alert(privateKey);
+	    var decrypt = new JSEncrypt();
+        decrypt.setPrivateKey(privateKey);
+        var decU = decrypt.decrypt(encryptedUserName);
+        var decP = decrypt.decrypt(encryptedPassword);
+        alert(decU+" :: "+ decP);
+	    
+	    
+	    var params = JSON.stringify({"userName":encryptedUserName ,"password": encryptedPassword}); 
 	    http.send(params);
 	    http.onload = function() {
 	        alert(http.responseText);
 	    }
 	    
 	 }
+	}
+function getPublicKey (){
+
+	
+	var http = new XMLHttpRequest();
+	    http.open("GET", "/key?appId=adbb", true);
+	    http.setRequestHeader("Content-type","application/json");
+	    //var params = JSON.stringify({"title": "foo","body": "bar","userId": 1}); //  document.getElementById(...).value
+	    http.send();
+	    http.onload = function() {
+	    	var keyData = JSON.parse(http.responseText).data;
+	    	publicKey = keyData.split("::::::::")[0];
+	    	privateKey = keyData.split("::::::::")[1];
+	       // alert(publicKey);
+	    }
+	    
+	 
 	}
 </script>
 
