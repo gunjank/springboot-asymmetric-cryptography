@@ -1,7 +1,6 @@
 package gunjan.utils;
 
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+
 import gunjan.dao.JDBCInMemory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -70,13 +69,13 @@ public class GenerateKeys {
 		return publicKeyPEM;
 	}
 	public PrivateKey readPrivateKey(String appId)
-			throws IOException, GeneralSecurityException, Base64DecodingException {
+			throws IOException, GeneralSecurityException {
 		PrivateKey key;
 		String fileString = this.jdbcInMemory.getPrivateKeyForAppId(appId);
 		fileString = fileString.replace(
 				"-----BEGIN RSA PRIVATE KEY-----\n", "")
 				.replace("-----END RSA PRIVATE KEY-----", "");
-		byte [] keyBytes = Base64.decode(fileString);
+		byte[] keyBytes = DatatypeConverter.parseBase64Binary(fileString);
 		PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
 		KeyFactory kf = KeyFactory.getInstance("RSA");
 		key = kf.generatePrivate(spec);

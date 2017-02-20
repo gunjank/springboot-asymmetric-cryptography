@@ -147,11 +147,13 @@ to {
 <body onload="getPublicKey()">
 
 <h2>Asymmetric-Cryptography </h2>
-<div id="log" class="wrapper" ></div>
+
 
 <button onclick="document.getElementById('id01').style.display='block'"
         style="width: auto;">Login
 </button>
+
+<div id="log" class="wrapper" ></div>
 
 <div id="id01" class="modal">
     <form class="modal-content animate" id="loginForm"
@@ -238,7 +240,7 @@ function getPublicKey (){
 	    http.send();
 	    http.onload = function() {
 	    	publicKey = JSON.parse(http.responseText).data;
-	    	logString("Public Key :: "+ publicKey );
+	    	logString("Public Key :: fetched" );
 	    	logString("App Id :: "+ uniqueAppId );
 
 	    }

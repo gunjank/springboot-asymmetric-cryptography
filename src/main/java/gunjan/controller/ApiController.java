@@ -1,6 +1,6 @@
 package gunjan.controller;
 
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
+
 import gunjan.model.Login;
 import gunjan.model.SuccessResponse;
 import gunjan.utils.GenerateKeys;
@@ -35,12 +35,11 @@ public class ApiController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json")
-    public SuccessResponse login(@RequestBody Login login) throws NoSuchAlgorithmException, NoSuchPaddingException, Base64DecodingException {
+    public SuccessResponse login(@RequestBody Login login) throws NoSuchAlgorithmException, NoSuchPaddingException {
         SuccessResponse res = new SuccessResponse();
         String uName = null;
         String pws = null;
         if (null != login) {
-
             Cipher cipher = Cipher.getInstance("RSA");
             try {
                 cipher.init(Cipher.DECRYPT_MODE, generateKeys.readPrivateKey(login.getAppId()));

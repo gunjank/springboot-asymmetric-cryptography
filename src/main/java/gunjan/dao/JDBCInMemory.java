@@ -137,7 +137,7 @@ public class JDBCInMemory {
             System.out.println("Connected database successfully...");
 
             //STEP 4: Execute a query
-            System.out.println("Inserting records into the table...");
+            System.out.println("Reading record from the table...");
             stmt = conn.createStatement();
             //if appid exist
             String sql = "SELECT PRIVATE_KEY FROM USER_APP_KEY WHERE APP_ID='"+appId+"'";
