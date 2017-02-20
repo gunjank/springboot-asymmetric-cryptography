@@ -1,28 +1,16 @@
 package gunjan.controller;
 
 import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-import gunjan.dao.JDBCInMemory;
 import gunjan.model.Login;
 import gunjan.model.SuccessResponse;
 import gunjan.utils.GenerateKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.xml.bind.DatatypeConverter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.*;
-import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.NoSuchAlgorithmException;
 
 @RestController
 public class ApiController {

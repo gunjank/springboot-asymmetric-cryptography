@@ -1,21 +1,15 @@
 package gunjan.utils;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.*;
-import java.security.spec.PKCS8EncodedKeySpec;
-
-import javax.xml.bind.DatatypeConverter;
 
 import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 import gunjan.dao.JDBCInMemory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 @Component
 public class GenerateKeys {
@@ -24,44 +18,34 @@ public class GenerateKeys {
 	private JDBCInMemory jdbcInMemory;
 
 	private KeyPairGenerator keyGen;
-	private KeyPair pair;
 	private PrivateKey privateKey;
 	private PublicKey publicKey;
-	static final String PUBLICKEY_PREFIX    = "-----BEGIN PUBLIC KEY-----";
-	static final String PUBLICKEY_POSTFIX   = "-----END PUBLIC KEY-----";
-	static final String PRIVATEKEY_PREFIX   = "-----BEGIN RSA PRIVATE KEY-----";
-	static final String PRIVATEKEY_POSTFIX  = "-----END RSA PRIVATE KEY-----";
-	
-	
-	public GenerateKeys(){};
-	public void generateSecureKeys(int keylength) throws NoSuchAlgorithmException, NoSuchProviderException {
+	private static final String PUBLICKEY_PREFIX    = "-----BEGIN PUBLIC KEY-----";
+	private static final String PUBLICKEY_POSTFIX   = "-----END PUBLIC KEY-----";
+	private static final String PRIVATEKEY_PREFIX   = "-----BEGIN RSA PRIVATE KEY-----";
+	private static final String PRIVATEKEY_POSTFIX  = "-----END RSA PRIVATE KEY-----";
+
+
+	public GenerateKeys(){}
+	private void generateSecureKeys() throws NoSuchAlgorithmException, NoSuchProviderException {
 		this.keyGen = KeyPairGenerator.getInstance("RSA");
-		this.keyGen.initialize(keylength);
+		this.keyGen.initialize(1024);
 	}
 
-	public void createKeys() {
-		this.pair = this.keyGen.generateKeyPair();
+	private void createKeys() {
+		KeyPair pair = this.keyGen.generateKeyPair();
 		this.privateKey = pair.getPrivate();
 		this.publicKey = pair.getPublic();
 	}
 
-	public PrivateKey getPrivateKey() {
+	private PrivateKey getPrivateKey() {
 		return this.privateKey;
 	}
 
-	public PublicKey getPublicKey() {
+	private PublicKey getPublicKey() {
 		return this.publicKey;
 	}
-//
-//	public void writeToFile(String path, String key) throws IOException {
-//		File f = new File(path);
-//		f.getParentFile().mkdirs();
-//		FileWriter fw = new FileWriter(f);
-//		fw.write(key);
-//		fw.close();
-//
-//
-//	}
+
 	private void saveKeysInDb (String appId, String publicKey, String privateKey)
 	{
 		this.jdbcInMemory.insertData(appId, publicKey, privateKey);
@@ -69,24 +53,17 @@ public class GenerateKeys {
 
 
 	public String keyGenerateAndReturnPublicKey(String appId) {
-		//GenerateKeys gk;
 		String publicKeyPEM = null;
-		String privateKeyPEM = null;
+		String privateKeyPEM;
 		System.out.println("main method of generator");
 		try {
-			//gk = new GenerateKeys(1024);
-			//gk.createKeys();
-			this.generateSecureKeys(1024);
+			this.generateSecureKeys();
 			this.createKeys();
 
 			// THIS IS PEM:
 	        publicKeyPEM = PUBLICKEY_PREFIX + "\n" + DatatypeConverter.printBase64Binary(this.getPublicKey().getEncoded()).replaceAll("(.{64})", "$1\n") + "\n" + PUBLICKEY_POSTFIX;
 	        privateKeyPEM = PRIVATEKEY_PREFIX + "\n" + DatatypeConverter.printBase64Binary(this.getPrivateKey().getEncoded()).replaceAll("(.{64})", "$1\n") + "\n" + PRIVATEKEY_POSTFIX;
-	        
-	        //gk.writeToFile("KeyPair/publicKey", publicKeyPEM);
-			//gk.writeToFile("KeyPair/privateKey", privateKeyPEM);
-			this.saveKeysInDb(appId,publicKeyPEM,privateKeyPEM);
-			
+	        this.saveKeysInDb(appId,publicKeyPEM,privateKeyPEM);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
@@ -94,8 +71,7 @@ public class GenerateKeys {
 	}
 	public PrivateKey readPrivateKey(String appId)
 			throws IOException, GeneralSecurityException, Base64DecodingException {
-		PrivateKey key = null;
-		//String fileString = new String(Files.readAllBytes(Paths.get("KeyPair/privateKey")), StandardCharsets.UTF_8);
+		PrivateKey key;
 		String fileString = this.jdbcInMemory.getPrivateKeyForAppId(appId);
 		fileString = fileString.replace(
 				"-----BEGIN RSA PRIVATE KEY-----\n", "")
